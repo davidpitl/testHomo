@@ -73,7 +73,8 @@ class HomoOP:
         print(f"Leyendo parametros desde {ruta}/public.txt")
         with open(ruta+os.sep+"public.txt", 'r') as f:
              data = json.load(f)
-        self.params=BFVParameters.from_dict(data['params'])     
+        self.params=BFVParameters.from_dict(data['params'])  
+        self.evaluator = BFVEvaluator(self.params)
       
         
     def encripta(self,v):
@@ -176,11 +177,13 @@ class HomoOP:
     
     def sumariza(self,df,fields,field):
         agr=df.groupby(by=fields)[field].apply(lambda serie:self.enc_acum(serie))
-        return pd.DataFrame(agr)
+        df=pd.DataFrame(agr)
+        df.reset_index(inplace=True)
+        return df
     
     def serializaPD(self,df,fichero):
         df=df.copy()
-        df.reset_index(inplace=True)
+        df.reset_index(inplace=True,drop=True)
         df.to_csv(fichero,index=False)
         
     def deserializaPD(self,fichero,fields):
